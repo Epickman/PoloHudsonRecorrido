@@ -1,0 +1,61 @@
+Creá un sitio web tipo "scrollytelling" (scroll-scrub) que muestre un recorrido en mapa por el Polo Hudson (zona industrial en Berazategui, Buenos Aires), con una línea que traza el recorrido real por las calles internas del predio.
+
+STACK
+- React + Vite
+- Leaflet.js (con react-leaflet) + tiles de OpenStreetMap (gratis, sin API key)
+- GSAP + ScrollTrigger para sincronizar scroll con la cámara del mapa
+- Mobile-first, mapa sticky, texto scrolleando por encima/al costado
+
+TILES
+Usar como capa base:
+https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+(o alternativa estilo oscuro gratis: CartoDB Dark Matter — https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png, sin necesidad de key)
+
+DATOS: PUNTOS DE INTERÉS
+const points = [
+  { id: 1, name: "Peaje Hudson", lat: 0, lng: 0, description: "" },
+  { id: 2, name: "FC Hogar & Deco", lat: 0, lng: 0, description: "" },
+  { id: 3, name: "Fenix Point", lat: 0, lng: 0, description: "" },
+  { id: 4, name: "Polo Design", lat: 0, lng: 0, description: "" },
+  { id: 5, name: "Amoblamientos Cholakian - Fábrica", lat: 0, lng: 0, description: "" },
+  { id: 6, name: "MueblesySillones.com", lat: 0, lng: 0, description: "" },
+  { id: 7, name: "Polo Hudson (predio)", lat: 0, lng: 0, description: "" },
+  { id: 8, name: "Nativa Buenos Aires", lat: 0, lng: 0, description: "" },
+  { id: 9, name: "California Cars", lat: 0, lng: 0, description: "" },
+  { id: 10, name: "Perfiles JMA SA - Polo Hudson", lat: 0, lng: 0, description: "" },
+  { id: 11, name: "Sagitario Deposito Hudson", lat: 0, lng: 0, description: "" },
+  { id: 12, name: "JCL Sillas y Mesas", lat: 0, lng: 0, description: "" },
+  { id: 13, name: "Centro de Diseño Italiano Showroom", lat: 0, lng: 0, description: "" },
+];
+
+DATOS: RUTA (recorrido perimetral)
+GeoJSON LineString con el trazado real del camino interno (contorno que bordea el predio, entra por Peaje Hudson y recorre las naves):
+
+const routeGeoJSON = {
+  type: "Feature",
+  geometry: {
+    type: "LineString",
+    coordinates: [
+      [-58.xxxx, -34.xxxx],
+      [-58.xxxx, -34.xxxx],
+    ]
+  }
+};
+
+FUNCIONALIDAD
+1. Mapa full-bleed, sticky mientras se scrollea (react-leaflet dentro de un contenedor position: sticky).
+2. La línea de ruta se dibuja progresivamente con el scroll: usar un Polyline de Leaflet cuyo array de coordenadas se recorta dinámicamente según el progreso del ScrollTrigger (scrub:true) — ir agregando vértices del array completo a medida que avanza el scroll.
+3. La cámara (map.flyTo o map.panTo con animate:true) sigue la posición actual del extremo del trazo en cada sección.
+4. Marcadores (L.marker o L.circleMarker) en cada punto de interés, que cambian de ícono/color cuando el trazo llega a su altura.
+5. Panel de texto lateral/inferior con nombre + descripción de cada punto, sincronizado al mismo scroll.
+6. Al final, fitBounds mostrando el contorno completo con todos los puntos.
+
+DISEÑO
+- Fondo oscuro, tiles de CartoDB Dark Matter
+- Línea de ruta en color celeste/accent
+- Barra de progreso lateral con los nombres de los puntos
+
+ENTREGABLES
+- Carpetas: components/Map, components/ScrollSections, components/Marker, data/points.js, data/route.geojson
+- Sin necesidad de tokens ni variables de entorno
+- Responsive: mobile con mapa 60% arriba, texto scrolleando abajo

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Polo Hudson — Recorrido"
+description = "Una experiencia scrollytelling mobile-first para explorar el recorrido industrial del Polo Hudson, con mapa sticky, ruta trazada por scroll y puntos de interés editables."
+version = "1.0.0"
+id = "artifacts/polo-hudson-scrollytelling"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25630
+
+[services.development]
+run = "pnpm --filter @workspace/polo-hudson-scrollytelling run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/polo-hudson-scrollytelling", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/polo-hudson-scrollytelling/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25630"
+BASE_PATH = "/"
